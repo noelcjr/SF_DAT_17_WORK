@@ -37,11 +37,11 @@ analysis to do a multivariate analysis. Which countries have the largest fluctua
 -I want to try to answer the question of how much information in the CIA factbook can be used as input for the 
 prediction of currency fluctuations. I could try to relate CIA factbook data with currency exchange data from 
 the Federal reserve. The hypothesis is that information on some of the rankings could be an indicator of long-term 
-currency fluctuations. This could be couple with methods that predict short term currency fluctuations to make
+currency fluctuations. This could be coupled with methods that predict short term, daily currency fluctuations to make
 a more robust algorithm. 
 
 Data source 
-I have curated ted the 2014 factbook into RVs files that are found in this repository. I removed a lot of information 
+I have curated the 2014 factbook into RVs files that are found in this repository. I removed a lot of information 
 to focus on parts of the fact-book that can be quantified and ranked.
 
 Code
