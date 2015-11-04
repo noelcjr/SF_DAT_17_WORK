@@ -1,6 +1,5 @@
 """
 This file loads tables from the mini CIA factbook mysql database
-
 This is a temporary script file.
 """
 import pandas as pd
@@ -42,7 +41,16 @@ fields.replace(np.nan,'nan', regex=True, inplace=True)
 #    categories['description'][i] = ""
 #    for paragraph in paragraphs:
 #        categories['description'][i] += paragraph.text + " "
-
+# 1 Introductions = 0
+# 2 Geography = 1
+# 3 People and Society = 17
+# 4 Government = 0
+# 5 Economy = 25
+# 6 Energy = 22
+# 7 Communications = 5
+# 8 Transportation = 5
+# 9 Military = 1
+# for a total of 76 categories
 
 # Generates a data frame indexed by country abreviation name.
 # The columns corresponds to 76 fields and they contain

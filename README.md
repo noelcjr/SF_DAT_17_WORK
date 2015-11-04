@@ -9,14 +9,14 @@ by Noel Carrascal
 
 Overview
 
-The CIA world fact-book is a description US government profiles of countries and territories around the world. 
-Information on geography, people, government, transportation, economy, communications, etc. The information is 
-reliable and can be used as input to do predictive and descriptive analytics. The factbook contains information 
-for two hundred and sixty one countries grouped in 9 categories: Introduction, Geography, People and Society, 
-Government, Economy, Energy, Communications, Transportation and Military. Countries are also divided into 13 
-regions: Oceans, Africa, Antarctica, Australia-Oceania, Central America and Caribbean, Central Asia, East & 
-Southeast Asia, Europe, Middle East, North America, South America, South Asia and Ocean. Countries are ranked 
-by 76 fields such as Surface Area, population, GDP, birth rate, etc. 
+The CIA world fact-book is a description US government profiles of countries and territories around the world 
+(i.e. geography, people, government, transportation, economy, communications, etc.) The information is reliable 
+and can be used as input to do predictive and descriptive analytics. The factbook contains information for two 
+hundred and sixty one countries grouped in 9 categories: Introduction, Geography, People and Society, Government, 
+Economy, Energy, Communications, Transportation and Military. Countries are also divided into 13 regions: Oceans, 
+Africa, Antarctica, Australia-Oceania, Central America and Caribbean, Central Asia, East & Southeast Asia, Europe, 
+Middle East, North America, South America, South Asia and Ocean. Countries are ranked by 76 fields such as Surface 
+Area, population, GDP, birth rate, etc. 
 
 For this project I will start with the 2014 factbook to predict GDP (gross domestic product purchasing power). 
 The 2014 factbook has GDP information for the previous three years. I will use those numbers to predict GDP for 
