@@ -200,16 +200,6 @@ for i in list_tuples:
     for j in years:
         null_heatmap.ix[(i[0],i[1])][j] = cia_fb3.xs((i[0],i[1],str(j)), level=('Category','Field','Year'), axis=1).isnull().sum().sum()
 
-sns.heatmap(null_heatmap)
-
-null_country_heatmap = []
-null_country_heatmap = pd.DataFrame(index=cia_fb3.index, columns=years)
-
-for j in years:
-    curr_year = cia_fb3.xs((str(j)), level=('Year'), axis=1)
-    for i in null_country_heatmap.index:
-        null_country_heatmap.ix[i][j] = curr_year.ix[i].isnull().sum()    
-#null_country_heatmap.ix[(i[0],i[1])][j] = cia_fb3.xs((i[0],i[1],str(j)), level=('Category','Field','Year'), axis=1).isnull().sum().sum()
-        
-#HEAT MAP DOES NOT WORK  sns.heatmap(null_country_heatmap)
+sns.heatmap(null_heatmap)  
     
+cia_fb3.to_csv('/home/noelcjr/github/SF_DAT_17_WORK/data/cia_factbook_200_countries_table.csv')

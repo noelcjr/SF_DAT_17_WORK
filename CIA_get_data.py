@@ -90,7 +90,7 @@ new_fields = list(set(all_fields)-set(removed_fields))
 #27) f2121           8  Railways
 #28) f2102           3  Life expectancy at birth
 #29) f2129           5  Unemployment rate
-#30) f2127           3  Total fertility rat
+#30) f2127           3  Total fertility rate
     
 # I now create a Data Frame to which I plan to read all new_fields from
 # the CIA factbook archive. The country name is the index and the coulumn
