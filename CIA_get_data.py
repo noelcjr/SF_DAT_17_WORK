@@ -1,31 +1,54 @@
 # -*- coding: utf-8 -*-
 """
 Created on Fri Oct 30 11:51:35 2015
-This file reads files from the CIA factbook archive. It only reads data
+
+Source for CIA Factbooks:
+https://www.cia.gov/library/publications/download/
+
+I downloaded all rankorder.zip files going back to 2004. Factbooks before 2004
+have no rankorder.zip files, so I do not consider them. As far as I look into
+the files downloaded, factbooks got standardize after 2004, with a few additional
+changes in 2006.
+
+All data comes from the CIA website; however, when I started this project and
+I wasn't familiar with the factbook, I downloaded a MySQL dump from:
+http://jmatchparser.sourceforge.net/factbook/. 
+It allowed me to explore the tables of countries, fields, categories, regions 
+and rankings usin SQL. I dumped the MySQL tables from that download to CSV 
+files which I then used as a Starting point for this project. Why not start 
+from the CIA factbook directly? That should be the right wa to do it, and it 
+should be done in the future. But becasue I have found so many problems with 
+the origianl CIA files, I will not get list of countries, fields and categories 
+from the  CIA for now. Using these dumped tables I look for data in the CIA
+Factbook. 
+
+This python program reads files from the CIA factbook archive. It only reads data
 from ranks by 30 fields. Of all the fields considered by the CIA, only 76
-are ranled, and of those only 30 fields have been consistently maintain
+are ranked, and of those only 30 fields in 2014 have been consistently maintain
 from 2004 and 2014. I will only work with those fields.
 
-Only countries that have no null valies in all 30 fields are considered.
+I also used existing countries in 2014. Some countries have disappeard, changed
+name or divided before 2014 and are not considered with the exception of two
+countries. Cape Verde changed its name to Cabo Verde and I fixed that to consider
+the country. Serbia and Montenegro dsplit in 2006. They are considered separatedly
+here since 2006. Before that, the joined country was not considered.  
 
-The output is dumped to a csv file to be loaded again for analysis.
-
-This file is a quick and dirty approach to getting the information
-from the CIA factbook for the GA project and for that purpuse I used
-fields available in 2014. I plan to make this code more general in the 
-future. Its current functionality is for the purpose of my project only. 
+I plan to make this code more general in the future. Its current functionality 
+is for the purpose of my project only.
+ 
 @author: Noel Carrascal
 @email: noelcarrascal@gmail.com
 """
 import pandas as pd
 import numpy as np
+import os, sys
 from bs4 import BeautifulSoup
 import os.path
  
-# Load the tables. This tables are from a different source and contain the
-# fields and countries considered in 2014 only. Becasue this source did not have
-# this information for year previous to 2014, I used it as a starting point
-# to analyze find and read information from previous year from the CIA factbook archive
+# Load the tables. This tables are from a different source and contain the fields
+# and countries considered in 2014 only. Becasue this source did not have this
+# information for year previous to 2014, I used it as a starting point to analyze,
+# find and read information from previous years from the CIA factbook archive
 fields = pd.read_csv('/home/noelcjr/github/SF_DAT_17_WORK/data/fields.csv')
 countries = pd.read_csv('/home/noelcjr/github/SF_DAT_17_WORK/data/countries.csv')
 regions = pd.read_csv('/home/noelcjr/github/SF_DAT_17_WORK/data/regions.csv')
@@ -33,12 +56,13 @@ categories = pd.read_csv('/home/noelcjr/github/SF_DAT_17_WORK/data/categories.cs
 
 path = '/home/noelcjr/Projects/CIA_factbook/'
 years = [2014,2013,2012,2011,2010,2009,2008,2007,2006,2005,2004]
-start_lines = [0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2]
-row_offset = [1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3]
 # I know from the CIA website that there are 76 fields that can be ranked
 # in 2014. I used those fields to check if they were considered in the previous
 # years. This is becase the factbook changes slightly from year to year.
 # The following lines check for all fields to have files for every year
+# The tables above also give me the name of the files that match a given
+# field (i.e. f2001.txt is GDP (purchasing power parity)
+# In the following loop I remove fields that are not present in all years
 removed_fields = []
 for i in years:
     for j in fields.xmlid:  # Loop for reading all field
@@ -48,141 +72,141 @@ for i in years:
 
 # Here, new_fields are those fields in 2014 that are present in all years
 # going back to 2004. Now we know that the CIA hava data for these fields for
-# all years. 
+# all years between 2004 and 2014. 
 removed_fields = list(set(removed_fields))
 all_fields = fields['xmlid']
 new_fields = list(set(all_fields)-set(removed_fields))
-#for i in new_fields:
-#    print(fields[fields.xmlid == i][['categoryid','name']])
-#             Category  Name
-# 3 People and Soc.
-# 7 Communications.
-# 5 Economy.
-# 8 Transportation.
-# 2 Geography.
-# 9 Military Expen.
-# 1) f2157           3  HIV/AIDS - deaths
-# 2) f2156           3  HIV/AIDS - people living with HIV/AIDS
-# 3) f2155           3  HIV/AIDS - adult prevalence rate
-# 4) f2153           7  Internet users
-# 5) f2151           7  Telephones - mobile cellular
-# 6) f2150           7  Telephones - main lines in use
-# 7) f2078           5  Exports
-# 8) f2079           5  Debt - external
-# 9) f2095           5  Labor force
-#10) f2092           5  Inflation rate (consumer prices)
-#11) f2091           3  Infant mortality rate
-#12) f2034           9  Military expenditures
-#13) f2119           3  Population
-#14) f2054           3  Birth rate
-#15) f2184           7  Internet hosts
-#16) f2186           5  Public debt
-#17) f2187           5  Current account balance
-#18) f2188           5  Reserves of foreign exchange and gold
-#19) f2066           3  Death rate
-#20) f2089           5  Industrial production growth rate
-#21) f2147           2  Area
-#22) f2085           8  Roadways
-#23) f2087           5  Imports
-#24) f2004           5  GDP - per capita (PPP)
-#25) f2001           5  GDP (purchasing power parity)
-#26) f2003           5  GDP - real growth rate
-#27) f2121           8  Railways
-#28) f2102           3  Life expectancy at birth
-#29) f2129           5  Unemployment rate
-#30) f2127           3  Total fertility rate
-    
-# I now create a Data Frame to which I plan to read all new_fields from
-# the CIA factbook archive. The country name is the index and the coulumn
-columns = []
-new_fields_cols = []
-fields_with_dollar_signs = []
-index = []
-region = []
-for j in range(0,len(new_fields)):
-    x = str(fields[fields.xmlid == new_fields[j]]['name']).split('\n')[0].split()
-    x = ' '.join(x[1:len(x)])  # gets rid of first element
-    columns.append(x)
+# Description of some Units in the following dictionary
+# I changed some units in some of the dictionary's fields becasue they were
+# given as NANs, as can be  seen in the previous loop.
+# HIV/AIDS - adult prevalence rate = % of adults 15-49 living with HIV/AIDS
+# Infant mortality rate = % dead infants under 1 yr/old per 1000 live births 
+#                         This needs to be fixed to percentages not per thousands
+# Birth Rate = % Births per year per 1000 persons in population. Fix from thousands to %
+# Death Rate = % Births per year per 1000 persons in population. Fix from thousands to %
+# Unemployment Rate = % of labor force unemployed
+# Military expenditures, Public debt = % of GDP',
+# Total fertility rate = children born/woman. Change to percentage of population
+# NANs = HIV/AIDS - deaths, HIV/AIDS - people living with HIV/AIDS, Internet users
+#        Telephones - mobile cellular, Telephones - main lines in use, Exports
+#        Debt - external, Labor force, Population, Internet hosts, 
+#        Reserves of foreign exchange and gold
+field_units = {'HIV/AIDS - deaths':'humans', \
+'HIV/AIDS - people living with HIV/AIDS':'humans', \
+'HIV/AIDS - adult prevalence rate':'%', \
+'Internet users':'humans', \
+'Telephones - mobile cellular':'connections', \
+'Telephones - main lines in use':'connections', \
+'Exports':'dollars', \
+'Debt - external':'dollars', \
+'Labor force':'humans', \
+'Inflation rate (consumer prices)':'%', \
+'Infant mortality rate':'%', \
+'Military expenditures':'%', \
+'Population':'humans', \
+'Birth rate':'%', \
+'Internet hosts':'connections', \
+'Public debt':'%', \
+'Current account balance':'dollars', \
+'Reserves of foreign exchange and gold':'dollars', \
+'Death rate':'%', \
+'Industrial production growth rate':'%', \
+'Area':'kms*kms', \
+'Roadways':'kms', \
+'Imports':'dollars', \
+'GDP - per capita (PPP)':'dollars', \
+'GDP (purchasing power parity)':'dollars', \
+'GDP - real growth rate':'%', \
+'Railways':'kms', \
+'Life expectancy at birth':'years', \
+'Unemployment rate':'%', \
+'Total fertility rate':'children born/woman'}
+# The following loop joins file names for the field  xmlid,
+# Category, field, units curated, and units from CIA Factbook in field_tuples.
+field_tuples = []
+for i in new_fields:
+    catid = int(fields.categoryid[fields.xmlid == i])
+    cat = str(categories['name'][categories.id == catid]).split('\n')[0].split()
+    fld = str(fields.name[(fields.categoryid == catid) & (fields.xmlid == i)]).split('\n')[0].split()
+    b = str(fields.unit[fields.xmlid == i]).split('\n')[0]
+    b = b.split()[1:len(b)]
+    field_tuples.append((i,' '.join(cat[1:len(cat)]),' '.join(fld[1:len(fld)]),field_units[' '.join(fld[1:len(fld)])],' '.join(b)))
 
+columns2D = []
+category_dict = {}
+for i in field_tuples:
+    a = i[2] + ' ('+i[3]+')'
+    category_dict[a] = i[1]
+    for j in years:
+        columns2D.append((a, i[1], j))
+# Here I associate countries with regions for the DataFrame index
+index = []
 for i in countries['name']:
     reg = int(str(countries.regionid[countries.name == i]).split('\n')[0].split()[1])
     reg = str(regions.name[regions.id == reg]).split('\n')[0].split()
     reg = ' '.join(reg[1:len(reg)])
     index.append((i,reg))
 
-
-columns2D = []
-categoryTuple = []
-for i in columns:
-    a = (str(categories.name[categories.id == int(fields.categoryid[fields.name == i])]).split('\n')[0]).split()
-    b = ' '.join(a[1:len(a)])
-    categoryTuple.append(b)
-    for j in years:
-        columns2D.append((i,b,j))
+# I now create a Data Frame to which I plan to read all new_fields from
+# the CIA factbook archive. The country name is the index and the coulumn
+#columns = []
+#new_fields_cols = []
+#fields_with_dollar_signs = []
+#region = []
+#for j in range(0,len(new_fields)):
+#    x = str(fields[fields.xmlid == new_fields[j]]['name']).split('\n')[0].split()
+#    x = ' '.join(x[1:len(x)])  # gets rid of first element
+#    columns.append(x)
+#columns2D = []
+#categoryDict = {}
+#for i in columns:
+#    a = (str(categories.name[categories.id == int(fields.categoryid[fields.name == i])]).split('\n')[0]).split()
+#    b = ' '.join(a[1:len(a)])
+#    categoryDict[i] = b
+#    for j in years:
+#        columns2D.append((i,b,j))
 
 cia_fact_book_table = pd.DataFrame(index=index, columns=columns2D)
-#cia_fact_book_table.columns=pd.MultiIndex.from_tuples(columns2D)
 # Create a list of list with country names
 # For every country, count how many words makeup the name,
 # Create columns in the array with first word of a country and number of words in the name
 # Use those columns to avoid problems in the formating of files, specially before 2008.
-c_list = []
+c_list = {}
+r_list = {}
 for i in range(0,len(cia_fact_book_table.index)):
-    c_list.append(cia_fact_book_table.index[i][0].split())
-
-for j in c_list:
-    l = len(j)
-    j.insert(0,l)
-
+    temp = cia_fact_book_table.index[i][0]
+    count = len(temp.split())
+    c_list[temp] = count
+    r_list[temp] = cia_fact_book_table.index[i][1]
 # before 2012 and before Cabo Verde was called Cape Verde: FIX!!!
 # Howland Island did not exist before 2012
-for i in range(0, len(years)):
-    for j in range(0,len(new_fields)):
-        # There has to be a better way to to get cat from new_fields in fewer lines.
-        cat = str(fields.categoryid[fields.xmlid == new_fields[j]]).split('\n')[0].split()
-        cat = categories.name[categories.id == int(' '.join(cat[1:len(cat)]))]
-        cat = ' '.join(str(cat).split('\n')[0].split()).split()
-        cat = ' '.join(cat[1:len(cat)])
-        lines = [line.split() for line in open(path+'/'+str(years[i])+'/factbook/rankorder/'+new_fields[j]+'.txt', 'r')]
-        for k in range(0,len(lines)):
-            if 'updated' not in lines[k]:  # Gets rid of last line that is not data due to weird formating before 2008 and before.
-                if k >= (start_lines[i]):
-                    if '$' in lines[k]:
-                        lines[k].remove('$')
-                    # Get first word of the country name:
-                    first = lines[k][1]
-                    if first == 'Cape':
-                        first = 'Cabo'
-                    # look for matching first words in c_list and create a list
-                    # of countries that mathc the first word in c_list
-                    matches = []
-                    for l in c_list:
-                        if first == l[1]:
-                            matches.append(l)
-                    # If there is only one country with a given first word only
-                    # then just get the name and move on. 
-                    if len(matches) == 1:                    
-                        country = ' '.join(lines[k][1:(matches[0][0]+1)])
-                        value = lines[k][(matches[0][0]+1)]
-                        if country == 'Cape Verde':
-                            country = 'Cabo Verde'
-                        reg = int(str(countries.regionid[countries.name == country]).split('\n')[0].split()[1])
-                        reg = str(regions.name[regions.id == reg]).split('\n')[0].split()
-                        reg = ' '.join(reg[1:len(reg)])
-                        cia_fact_book_table[(columns[j],cat,years[i])][(country,reg)] = str(value)
-                    else:
-                        for m in matches:
-                            m_length = m[0]
-                            m_country = ' '.join(m[1:(m_length+1)])
-                            for n in range(2,len(lines[k])):
-                                l_country = ' '.join(lines[k][1:n])
-                                if m_country == l_country:
-                                    country = m_country
-                                    reg = int(str(countries.regionid[countries.name == country]).split('\n')[0].split()[1])
-                                    reg = str(regions.name[regions.id == reg]).split('\n')[0].split()
-                                    reg = ' '.join(reg[1:len(reg)])
-                                    value = lines[k][(m_length+1)]
-                                    cia_fact_book_table[(columns[j],cat,years[i])][(country,reg)] = str(value)
+for i in range(0,len(years)):
+    count = 1
+    for j in field_tuples:
+        lines = [line.split() for line in open(path+'/'+str(years[i])+'/factbook/rankorder/'+j[0]+'.txt', 'r')]
+        for k in lines:
+            if '$' in k:
+                k.remove('$')
+            tempStr = k[1:len(k)]        
+            for l in range(len(tempStr),0,-1):
+                if (' '.join(tempStr[0:l])) in c_list:
+                    country = ' '.join(tempStr[0:l])
+                    if country == 'Cape Verde':
+                        country = 'Cabo Verde'                    
+                    # If it can't convert from string to float, it means that the there is a
+                    # country that changed name in years other than 2014. This happend to
+                    #  1) United States Pacific Island Wildlife Refuge. For reasons I could not explain,
+                    #     but this country was eventually removed.
+                    #  2) Neatherland Antilles ceased to exist or changed name in 2010.
+                    #  3) Serbia and Montenegro ceased to exist by splitting into two countries in 2006.
+                    # CHECK HOW TO ADDRESS THIS CASES!!!
+                    try:
+                        value = float(tempStr[l].replace(',',''))
+                        count = count + 1
+                        cat = j[2] + ' (' + j[3] + ')'
+                        cia_fact_book_table[(cat,category_dict[cat],years[i])][(country,r_list[country])] = value                      
+                    except ValueError,e:
+                        print "error",e,"line=",k," year",years[i]," field=",j," value=",tempStr[l]
 
 cia_fact_book_table.columns=pd.MultiIndex.from_tuples(columns2D, names=['Field','Category','Year'])
 cia_fact_book_table.index = pd.MultiIndex.from_tuples(index, names=['Country','Region'])

@@ -14,18 +14,18 @@ cia_fb = pd.read_csv('/home/noelcjr/github/SF_DAT_17_WORK/data/cia_factbook_tabl
 cia_fb.shape  
 #  261 x 330 = 86,130 values in the CIA factbook
 (cia_fb.isnull().sum().sum()/float(cia_fb.shape[0]*cia_fb.shape[1]))*100
-# There are 19,392 null values in the table wich corresponds
-# to 22.51% of the values in the table
+# There are 19,698 null values in the table wich corresponds
+# to 22.87% of the values in the table
 # We now check the number of nulls adding the nans in each columns
 count = 0
 for i in cia_fb.columns:
      count = count + cia_fb[i].isnull().sum()
-# count = 19392 nulls 
+# count = 19698 nulls 
 # Same check for rows:
 count = 0
 for i in cia_fb.index:
     count = count + cia_fb.ix[i].isnull().sum()
-# count = 19392
+# count = 19698
 # Get values for fields, categories, years and regions
 f = []
 c = []
@@ -50,47 +50,47 @@ for i in categories:
         count = count + cia_fb[j][i][:].isnull().sum().sum()
     supercount = supercount + count
     print(i,count,supercount)
-#    ('Transportation', 1843, 1964)
-#    ('Communications', 1761, 4022)
-#          ('Military', 1031, 5091)
-#('People and Society', 5775, 11460)
-#           ('Economy', 8864, 21147)
-#         ('Geography',  118, 21265
+#    ('Transportation', 1856,  1856)
+#    ('Communications', 1805,  3661)
+#          ('Military', 1040,  4701)
+#('People and Society', 5874, 10575)
+#           ('Economy', 8994, 19569)
+#         ('Geography',  129, 19698)
 supercount = 0
 count = 0
 for i in fields:
      count = count + cia_fb.xs((i), level=('Field'), axis=1).isnull().sum().sum()
      print(i,cia_fb.xs((i), level=('Field'), axis=1).isnull().sum().sum()) 
-#      ('HIV/AIDS - adult prevalence rate', 1023)'People and Soc'
-#                                  ('Area',  118)'Geography'
-#                              ('Railways', 1392)'Transportation'
-#     ('Industrial production growth rate',  994)'Economy'
-#('HIV/AIDS - people living with HIV/AIDS', 1069)'People and Soc'
-#         ('GDP (purchasing power parity)',  385)'Economy'
-#      ('Inflation rate (consumer prices)',  444)'Economy'
-#                               ('Exports',  438)'Economy'
-#                ('GDP - per capita (PPP)',  385)'Economy'
-#                        ('Internet users',  495)'Communications'
-#                        ('Internet hosts',  426)'Communications'
-#               ('Current account balance',  903)'Economy'
-#                       ('Debt - external',  642)'Economy'
-#                     ('HIV/AIDS - deaths', 1199)'People and Soc'
-#          ('Telephones - mobile cellular',  453)'Communications'
-#                            ('Population',  282)'People and Soc'
-#        ('Telephones - main lines in use',  387)'Communications'
-#                              ('Roadways',  451)'Transportation'
-#                           ('Labor force',  429)'Economy'
-#                 ('Military expenditures', 1031)'Military Expen'
-#                            ('Death rate',  431)'People and Soc.'
-#                           ('Public debt', 1425)'Economy'
-#                               ('Imports',  444)'Economy'
-#                ('GDP - real growth rate',  505)'Economy'
-#                 ('Infant mortality rate',  446)'People and Soc.'
-#                            ('Birth rate',  436)'People and Soc.'
-#                     ('Unemployment rate',  720)'Economy'
-# ('Reserves of foreign exchange and gold', 1150)'Economy'
-#                  ('Total fertility rate',  442)'People and Soc.'
-#              ('Life expectancy at birth',  447)'People and Soc.'
+#      ('HIV/AIDS - adult prevalence rate', 1034)'People and Soc'
+#                                  ('Area',  129)'Geography'
+#                              ('Railways', 1394)'Transportation'
+#     ('Industrial production growth rate', 1001)'Economy'
+#('HIV/AIDS - people living with HIV/AIDS', 1080)'People and Soc'
+#         ('GDP (purchasing power parity)',  396)'Economy'
+#      ('Inflation rate (consumer prices)',  455)'Economy'
+#                               ('Exports',  449)'Economy'
+#                ('GDP - per capita (PPP)',  396)'Economy'
+#                        ('Internet users',  506)'Communications'
+#                        ('Internet hosts',  437)'Communications'
+#               ('Current account balance',  914)'Economy'
+#                       ('Debt - external',  654)'Economy'
+#                     ('HIV/AIDS - deaths', 1210)'People and Soc'
+#          ('Telephones - mobile cellular',  464)'Communications'
+#                            ('Population',  293)'People and Soc'
+#        ('Telephones - main lines in use',  398)'Communications'
+#                              ('Roadways',  462)'Transportation'
+#                           ('Labor force',  438)'Economy'
+#                 ('Military expenditures', 1040)'Military Expen'
+#                            ('Death rate',  442)'People and Soc.'
+#                           ('Public debt', 1428)'Economy'
+#                               ('Imports',  455)'Economy'
+#                ('GDP - real growth rate',  516)'Economy'
+#                 ('Infant mortality rate',  457)'People and Soc.'
+#                            ('Birth rate',  447)'People and Soc.'
+#                     ('Unemployment rate',  731)'Economy'
+# ('Reserves of foreign exchange and gold', 1161)'Economy'
+#                  ('Total fertility rate',  453)'People and Soc.'
+#              ('Life expectancy at birth',  458)'People and Soc.'
 country_null = []
 for i in cia_fb.index:
     country_null.append((i[0],i[1],cia_fb.loc[i[0]].isnull().sum().sum()))
@@ -105,58 +105,58 @@ for i in country_null:
         index2.append((i[0],i[1]))
         
 cia_fb2 = pd.DataFrame(cia_fb,index=index2, columns=cia_fb.columns)
-# Count = 11549 nan values after deletion
+# Count = 11855 nan values after deletion
 # cia_fb2.shape = (236x330)
-# (11549/77880)*100 = 14.83%
+# (11855/77880)*100 = 15.22%
 cia_fb2.xs(('Transportation'), level=('Category'), axis=1).isnull().sum().sum()
-#('Transportation', 1302, 1302)   22 Columns
+#('Transportation', 1315, 1315)   22 Columns
 cia_fb2.xs(('Communications'), level=('Category'), axis=1).isnull().sum().sum()
-#('Communications', 724, 2026)  44 Columns
+#('Communications', 768, )  44 Columns
 cia_fb2.xs(('Military'), level=('Category'), axis=1).isnull().sum().sum()
-#('Military', 763, 2789)   11 Columns
+#('Military', 772, )   11 Columns
 cia_fb2.xs(('People and Society'), level=('Category'), axis=1).isnull().sum().sum()
-#('People and Society', 3374, 6163)
+#('People and Society', 3473, )
 cia_fb2.xs(('Economy'), level=('Category'), axis=1).isnull().sum().sum()
-#('Economy', 5342, 11505)  143 Columns
+#('Economy', 5472, )  143 Columns
 cia_fb2.xs(('Geography'), level=('Category'), axis=1).isnull().sum().sum()
-#('Geography', 44, 11549)  11 Columns
+#('Geography', 55, )  11 Columns
 
-stat14 = cia_fb2.xs(('People and Society','Population','2014'), level=('Category','Field','Year'), axis=1)
-stat14[('population','People and Society','2014')] = [int(i.replace(",","")) for i in stat14[('Population','People and Society','2014')]]
+stat14 = cia_fb2.xs(('Population','People and Society','2014'), level=('Field','Category','Year'), axis=1)
+#stat14[('population','People and Society','2014')] = [int(i.replace(",","")) for i in stat14[('Population','People and Society','2014')]]
 stat14[('GDP - per capita (PPP)','Economy','2014')] = cia_fb2.xs(('GDP - per capita (PPP)','Economy','2014'), level=('Field','Category','Year'), axis=1)
-stat14[('GDP - per capita (PPP)','Economy','2014')].fillna("-1", inplace=True)
-stat14[('gdp_pc','Economy','2014')] = [int(i.replace(",","")) for i in stat14[('GDP - per capita (PPP)','Economy','2014')]]
+stat14[('GDP - per capita (PPP)','Economy','2014')].fillna(-1, inplace=True)
+#stat14[('gdp_pc','Economy','2014')] = [int(i.replace(",","")) for i in stat14[('GDP - per capita (PPP)','Economy','2014')]]
 stat14[('Nulls','Number per country','2014')] = [cia_fb2.loc[i[0]].isnull().sum().sum() for i in cia_fb2.index]
 stat14.dtypes
-stat14 = stat14[[('population','People and Society','2014'),('gdp_pc','Economy','2014'),('Nulls','Number per country','2014')]]
-stat14.sort(columns=(('population','People and Society','2014')), axis=0, ascending=False, inplace=True, kind='quicksort', na_position='last')
+stat14 = stat14[[('Population','People and Society','2014'),('GDP - per capita (PPP)','Economy','2014'),('Nulls','Number per country','2014')]]
+stat14.sort(columns=(('Population','People and Society','2014')), axis=0, ascending=False, inplace=True, kind='quicksort', na_position='last')
 ''' The following loop shows population, gdp per capita and number of nulls. To select elimination criteria'''
 country_in = []
 count = 1
 for i in stat14.index:
      # The following if eliminates 38 countries that are too small and with low economic impact to be statistically significant 
-     if stat14.ix[i[0]][('population','People and Society','2014')][0] < 150000 and stat14.ix[i[0]][('gdp_pc','Economy','2014')][0] < 35000:
+     if stat14.ix[i[0]][('Population','People and Society','2014')][0] < 150000 and stat14.ix[i[0]][('GDP - per capita (PPP)','Economy','2014')][0] < 35000:
          print('Eliminated',count,i[0])
          count = count + 1
      else:
          country_in.append((i[0],i[1]))
  
 cia_fb3 = pd.DataFrame(cia_fb,index=country_in, columns=cia_fb.columns)
-# Count = 6189 nan values after deletion
-# cia_fb2.shape = (236x330)
-# (6189/77880)*100 = 7.95%
+# Count = 6495 nan values after deletion
+# cia_fb2.shape = (200x330)
+# (6495/77880)*100 = 8.34%
 cia_fb3.xs(('Transportation'), level=('Category'), axis=1).isnull().sum().sum()
-#('Transportation', 822, 822)   22 Columns
+#('Transportation', 835, 835)   22 Columns
 cia_fb3.xs(('Communications'), level=('Category'), axis=1).isnull().sum().sum()
-#('Communications', 276, 1098)  44 Columns
+#('Communications', 320, )  44 Columns
 cia_fb3.xs(('Military'), level=('Category'), axis=1).isnull().sum().sum()
-#('Military', 389, 1487)   11 Columns
+#('Military', 398, )   11 Columns
 cia_fb3.xs(('People and Society'), level=('Category'), axis=1).isnull().sum().sum()
-#('People and Society', 1610, 3097)
+#('People and Society', 1709, )
 cia_fb3.xs(('Economy'), level=('Category'), axis=1).isnull().sum().sum()
-#('Economy', 3066, 4676)  143 Columns
+#('Economy', 3196, )  143 Columns
 cia_fb3.xs(('Geography'), level=('Category'), axis=1).isnull().sum().sum()
-#('Geography', 26, 6189)  11 Columns  
+#('Geography', 37, )  11 Columns  
 list_tuples = [('Geography','Area'), 
                ('Economy','Industrial production growth rate'), \
                ('Economy','GDP (purchasing power parity)'), \

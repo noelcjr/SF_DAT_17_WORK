@@ -10,14 +10,14 @@ import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 
 cia_200fb = pd.read_csv('/home/noelcjr/github/SF_DAT_17_WORK/data/cia_factbook_200_countries_table.csv',index_col=[0,1], header=[0, 1, 2]) #, skipinitialspace=True, tupleize_cols=False)
-
+cia_200fb.isnull().sum().sum() # = 6495
 EU = ['Austria','Belgium','Bulgaria','Cyprus','Croatia','Czech Republic', \
 'Denmark','Estonia','Finland','France','Germany','Greece','Hungary','Ireland', \
 'Italy','Latvia','Lithuania','Luxembourg','Malta','Netherlands','Poland', \
 'Portugal','Romania','Slovakia','Slovenia','Spain','Sweden','United Kingdom']
 
 years = [2014,2013,2012,2011,2010,2009,2008,2007,2006,2005,2004]
-list_tuples = [('Geography','Area'), 
+list_tuples = [('Geography','Area'), \
                ('Economy','Industrial production growth rate'), \
                ('Economy','GDP (purchasing power parity)'), \
                ('Economy','Inflation rate (consumer prices)'), \
@@ -47,6 +47,7 @@ list_tuples = [('Geography','Area'),
                ('People and Society','HIV/AIDS - deaths'), \
                ('People and Society','HIV/AIDS - people living with HIV/AIDS'), \
                ('People and Society','HIV/AIDS - adult prevalence rate')]
+              
 
 new_tuples_cols = []
 stats_on_field = ['nulls','a1','b1','2014','a2','b2','2013']
@@ -93,6 +94,15 @@ for i in list_tuples:
             countries_lr_stats.ix[temp.index[j]][(i[1],i[0],'b1')] = float(linreg.intercept_)
             val = linreg.predict(2014)[0]
             countries_lr_stats.ix[temp.index[j]][(i[1],i[0],'2014')] = float(val)
+            #With All null values eliminated and linear regressions calculated... move on to fill in missing values in original
+            #cia factbook data.
+            count = 0
+            for k in cnull['value']:
+                if k:
+                    cia_200fb.loc[temp.index[j],(i[1],i[0],cnull.year[str(years[count])])] = float(linreg.predict(years[count])[0])
+                    #print('Null:',temp.index[j],years[count])
+                    supercount = supercount + 1
+                count = count + 1
             if nulls2 < 9:  # This means that 2014 is not null and we can do the linear regression upto 2013, and estimate 2014
                 linreg2 = LinearRegression()
                 linreg2.fit(X[1:len(X)],y[1:len(y)])
@@ -100,14 +110,54 @@ for i in list_tuples:
                 countries_lr_stats.ix[temp.index[j]][(i[1],i[0],'b2')] = float(linreg2.intercept_)
                 val2 = linreg2.predict(2014)[0]
                 countries_lr_stats.ix[temp.index[j]][(i[1],i[0],'2013')] = float(val2)
-        #With All null values eliminated and linear regressions calculated... move on to fill in missing values in original
-        #cia factbook data.
-        count = 0
-        for j in cnull['value']:
-            if j:
-                cia_200fb.loc[temp.index[j],(i[1],i[0],cnull.year[str(years[count])])] = float(val)
-            count = count + 1
 
+for i in list_tuples:
+    temp = cia_200fb.xs((i[0],i[1]), level=('Category','Field'), axis=1)
+    print("#",i[0],i[1],temp.isnull().sum().sum())
+#  Null values per fields
+#', 'Geography', 'Area', 0)
+#', 'Economy', 'Industrial production growth rate', 297)
+#', 'Economy', 'GDP (purchasing power parity)', 0)
+#', 'Economy', 'Inflation rate (consumer prices)', 33)
+#', 'Economy', 'Exports', 55)
+#', 'Economy', 'GDP - per capita (PPP)', 0)
+#', 'Economy', 'Current account balance', 218)
+#', 'Economy', 'Debt - external', 121)
+#', 'Economy', 'Labor force', 11)
+#', 'Economy', 'Public debt', 590)
+#', 'Economy', 'Imports', 55)
+#', 'Economy', 'GDP - real growth rate', 33)
+#', 'Economy', 'Unemployment rate', 273)
+#', 'Economy', 'Reserves of foreign exchange and gold', 404)
+#', 'Communications', 'Internet users', 55)
+#', 'Communications', 'Internet hosts', 55)
+#', 'Communications', 'Telephones - mobile cellular', 11)
+#', 'Communications', 'Telephones - main lines in use', 11)
+#', 'Transportation', 'Roadways', 44)
+#', 'Transportation', 'Railways', 693)
+#', 'Military', 'Military expenditures', 334)
+#', 'People and Society', 'Death rate', 22)
+#', 'People and Society', 'Infant mortality rate', 33)
+#', 'People and Society', 'Birth rate', 22)
+#', 'People and Society', 'Total fertility rate', 33)
+#', 'People and Society', 'Life expectancy at birth', 44)
+#', 'People and Society', 'Population', 0)
+#', 'People and Society', 'HIV/AIDS - deaths', 435)
+#', 'People and Society', 'HIV/AIDS - people living with HIV/AIDS', 360)
+#', 'People and Society', 'HIV/AIDS - adult prevalence rate', 340
+    
+for i in set([n[0] for n in list_tuples]):
+    temp = cia_200fb.xs((i), level=('Category'), axis=1)
+    print("#",i,temp.isnull().sum().sum())
+#', 'Transportation', 737)
+#', 'Communications', 132)
+#', 'Military', 334)
+#', 'People and Society', 1289)
+#', 'Geography', 0)
+#', 'Economy', 2090)
+cia_200fb2 = cia_200fb.dropna()          
+(cia_200fb2[('Population','People and Society','2014')].sum()/cia_200fb[('Population','People and Society','2014')].sum())*100
+(cia_200fb2[('GDP (purchasing power parity)','Economy','2014')].sum()/cia_200fb[('GDP (purchasing power parity)','Economy','2014')].sum())*100
 # FAILS AT: cia_200fb.ix[('United States', 'North America')][('Area','Geography','2014')]
            
 # WARNING temp.ix[temp.index[100] has weird values from 2005 and 2004 Economy Industrial production growth rate.
