@@ -9,63 +9,34 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 
-cia_200fb = pd.read_csv('/home/noelcjr/github/SF_DAT_17_WORK/data/cia_factbook_200_countries_table.csv',index_col=[0,1], header=[0, 1, 2]) #, skipinitialspace=True, tupleize_cols=False)
-cia_200fb.isnull().sum().sum() # = 6495
+#cia_200fb = pd.read_csv('/home/noelcjr/github/SF_DAT_17_WORK/data/cia_factbook_200_countries_table.csv',index_col=[0,1], header=[0, 1, 2]) #, skipinitialspace=True, tupleize_cols=False)
+#cia_200fb.isnull().sum().sum() # = 6495
+cia_fb = pd.read_csv('/home/noelcjr/github/SF_DAT_17_WORK/data/cia_factbook_table.csv',index_col=[0,1], header=[0, 1, 2]) #, skipinitialspace=True, tupleize_cols=False)
+
 EU = ['Austria','Belgium','Bulgaria','Cyprus','Croatia','Czech Republic', \
 'Denmark','Estonia','Finland','France','Germany','Greece','Hungary','Ireland', \
 'Italy','Latvia','Lithuania','Luxembourg','Malta','Netherlands','Poland', \
 'Portugal','Romania','Slovakia','Slovenia','Spain','Sweden','United Kingdom']
 
 years = [2014,2013,2012,2011,2010,2009,2008,2007,2006,2005,2004]
-list_tuples = [('Geography','Area'), \
-               ('Economy','Industrial production growth rate'), \
-               ('Economy','GDP (purchasing power parity)'), \
-               ('Economy','Inflation rate (consumer prices)'), \
-               ('Economy','Exports'), \
-               ('Economy','GDP - per capita (PPP)'), \
-               ('Economy','Current account balance'), \
-               ('Economy','Debt - external'), \
-               ('Economy','Labor force'), \
-               ('Economy','Public debt'), \
-               ('Economy','Imports'), \
-               ('Economy','GDP - real growth rate'), \
-               ('Economy','Unemployment rate'), \
-               ('Economy','Reserves of foreign exchange and gold'), \
-               ('Communications','Internet users'), \
-               ('Communications','Internet hosts'), \
-               ('Communications','Telephones - mobile cellular'), \
-               ('Communications','Telephones - main lines in use'), \
-               ('Transportation','Roadways'), \
-               ('Transportation','Railways'), \
-               ('Military','Military expenditures'), \
-               ('People and Society','Death rate'), \
-               ('People and Society','Infant mortality rate'), \
-               ('People and Society','Birth rate'), \
-               ('People and Society','Total fertility rate'), \
-               ('People and Society','Life expectancy at birth'), \
-               ('People and Society','Population'), \
-               ('People and Society','HIV/AIDS - deaths'), \
-               ('People and Society','HIV/AIDS - people living with HIV/AIDS'), \
-               ('People and Society','HIV/AIDS - adult prevalence rate')]
               
-
 new_tuples_cols = []
 stats_on_field = ['nulls','a1','b1','2014','a2','b2','2013']
-for i in list_tuples:
+for i in cia_fb.columns:
     for j in stats_on_field:
         new_tuples_cols.append((i[1],i[0],j))
 
 new_tuples_index = []
-for i in cia_200fb.index:
+for i in cia_fb.index:                                                # Change cia_fb to cia_200fb
     new_tuples_index.append((i[0],i[1]))
     
-countries_lr_stats = pd.DataFrame(index=cia_200fb.index, columns=new_tuples_cols)
+countries_lr_stats = pd.DataFrame(index=cia_fb.index, columns=new_tuples_cols)  # Change cia_fb to cia_200fb
 countries_lr_stats.columns=pd.MultiIndex.from_tuples(new_tuples_cols, names=['Field','Category','Stats'])
 # The following line flatens a multi index dataframe
 # testPDF.columns = [' @ '.join(col).strip() for col in testPDF.columns.values]
 supercount = 0
-for i in list_tuples:
-    temp = cia_200fb.xs((i[0],i[1]), level=('Category','Field'), axis=1)
+for i in cia_fb.columns:
+    temp = cia_fb.xs((i[0],i[1]), level=('Field','Category'), axis=1)   # Change cia_fb to cia_200fb
     for j in range(0,len(temp)):
         c = pd.DataFrame(temp.ix[j])
         c.columns = ['value']
@@ -99,7 +70,7 @@ for i in list_tuples:
             count = 0
             for k in cnull['value']:
                 if k:
-                    cia_200fb.loc[temp.index[j],(i[1],i[0],cnull.year[str(years[count])])] = float(linreg.predict(years[count])[0])
+                    cia_fb.loc[temp.index[j],(i[0],i[1],cnull.year[str(years[count])])] = float(linreg.predict(years[count])[0]) # Change cia_fb to cia_200fb
                     #print('Null:',temp.index[j],years[count])
                     supercount = supercount + 1
                 count = count + 1
@@ -111,53 +82,31 @@ for i in list_tuples:
                 val2 = linreg2.predict(2014)[0]
                 countries_lr_stats.ix[temp.index[j]][(i[1],i[0],'2013')] = float(val2)
 
-for i in list_tuples:
-    temp = cia_200fb.xs((i[0],i[1]), level=('Category','Field'), axis=1)
-    print("#",i[0],i[1],temp.isnull().sum().sum())
-#  Null values per fields
-#', 'Geography', 'Area', 0)
-#', 'Economy', 'Industrial production growth rate', 297)
-#', 'Economy', 'GDP (purchasing power parity)', 0)
-#', 'Economy', 'Inflation rate (consumer prices)', 33)
-#', 'Economy', 'Exports', 55)
-#', 'Economy', 'GDP - per capita (PPP)', 0)
-#', 'Economy', 'Current account balance', 218)
-#', 'Economy', 'Debt - external', 121)
-#', 'Economy', 'Labor force', 11)
-#', 'Economy', 'Public debt', 590)
-#', 'Economy', 'Imports', 55)
-#', 'Economy', 'GDP - real growth rate', 33)
-#', 'Economy', 'Unemployment rate', 273)
-#', 'Economy', 'Reserves of foreign exchange and gold', 404)
-#', 'Communications', 'Internet users', 55)
-#', 'Communications', 'Internet hosts', 55)
-#', 'Communications', 'Telephones - mobile cellular', 11)
-#', 'Communications', 'Telephones - main lines in use', 11)
-#', 'Transportation', 'Roadways', 44)
-#', 'Transportation', 'Railways', 693)
-#', 'Military', 'Military expenditures', 334)
-#', 'People and Society', 'Death rate', 22)
-#', 'People and Society', 'Infant mortality rate', 33)
-#', 'People and Society', 'Birth rate', 22)
-#', 'People and Society', 'Total fertility rate', 33)
-#', 'People and Society', 'Life expectancy at birth', 44)
-#', 'People and Society', 'Population', 0)
-#', 'People and Society', 'HIV/AIDS - deaths', 435)
-#', 'People and Society', 'HIV/AIDS - people living with HIV/AIDS', 360)
-#', 'People and Society', 'HIV/AIDS - adult prevalence rate', 340
-    
-for i in set([n[0] for n in list_tuples]):
-    temp = cia_200fb.xs((i), level=('Category'), axis=1)
-    print("#",i,temp.isnull().sum().sum())
-#', 'Transportation', 737)
-#', 'Communications', 132)
-#', 'Military', 334)
-#', 'People and Society', 1289)
-#', 'Geography', 0)
-#', 'Economy', 2090)
-cia_200fb2 = cia_200fb.dropna()          
-(cia_200fb2[('Population','People and Society','2014')].sum()/cia_200fb[('Population','People and Society','2014')].sum())*100
-(cia_200fb2[('GDP (purchasing power parity)','Economy','2014')].sum()/cia_200fb[('GDP (purchasing power parity)','Economy','2014')].sum())*100
+cia_fb.isnull().sum().sum()
+# 16719
+# NULLS by country
+# Get rid of Oceans, Poles, World, territories, and Fill Up European Union from countries
+# Create heat map with nullvalues per fields. After I regularize the data, I could discard
+# some fields with redundant or many null Values.
+country_null = []
+for i in cia_fb.index:
+    country_null.append((i[0],i[1],cia_fb.loc[i[0]].isnull().sum().sum()))
+
+#NULSS by field
+count = 0
+for i in fields:
+     count = count + cia_fb.xs((i), level=('Field'), axis=1).isnull().sum().sum()
+     print(i,cia_fb.xs((i), level=('Field'), axis=1).isnull().sum().sum(),count) 
+
+catss = ['Geography','Economy','Communications','Transportation','Military','People and Society']
+for i in catss:
+    temp = cia_fb.xs((i), level=('Category'), axis=1)   # Change cia_fb to cia_200fb
+    print(i,temp.isnull().sum().sum())
+
+cia_fb2  = cia_fb
+cia_fb2 = cia_fb.dropna()          # Change cia_fb to cia_200fb
+(cia_fb2[('Population','People and Society','2014')].sum()/cia_fb[('Population','People and Society','2014')].sum())*100  # Change cia_fb to cia_200fb
+(cia_fb2[('GDP (purchasing power parity)','Economy','2014')].sum()/cia_fb[('GDP (purchasing power parity)','Economy','2014')].sum())*100  # Change cia_fb to cia_200fb
 # FAILS AT: cia_200fb.ix[('United States', 'North America')][('Area','Geography','2014')]
            
 # WARNING temp.ix[temp.index[100] has weird values from 2005 and 2004 Economy Industrial production growth rate.

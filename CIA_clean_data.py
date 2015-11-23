@@ -56,11 +56,10 @@ for i in categories:
 #('People and Society', 5874, 10575)
 #           ('Economy', 8994, 19569)
 #         ('Geography',  129, 19698)
-supercount = 0
 count = 0
 for i in fields:
      count = count + cia_fb.xs((i), level=('Field'), axis=1).isnull().sum().sum()
-     print(i,cia_fb.xs((i), level=('Field'), axis=1).isnull().sum().sum()) 
+     print(i,cia_fb.xs((i), level=('Field'), axis=1).isnull().sum().sum(),count) 
 #      ('HIV/AIDS - adult prevalence rate', 1034)'People and Soc'
 #                                  ('Area',  129)'Geography'
 #                              ('Railways', 1394)'Transportation'
