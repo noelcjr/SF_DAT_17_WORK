@@ -138,7 +138,11 @@ for i in field_tuples:
     a = i[2] + ' ('+i[3]+')'
     category_dict[a] = i[1]
     for j in years:
-        columns2D.append((a, i[1], j))
+        columns2D.append((i[1], a, j))
+
+# Sort column tuples by Categories in place
+columns2D.sort(key=lambda tup: tup[0])
+
 # Here I associate countries with regions for the DataFrame index
 index = []
 for i in countries['name']:
@@ -199,16 +203,17 @@ for i in range(0,len(years)):
                     #     but this country was eventually removed.
                     #  2) Neatherland Antilles ceased to exist or changed name in 2010.
                     #  3) Serbia and Montenegro ceased to exist by splitting into two countries in 2006.
-                    # CHECK HOW TO ADDRESS THIS CASES!!!
+                    # CHECK HOW TO ADDRESS THESE CASES!!!
                     try:
                         value = float(tempStr[l].replace(',',''))
                         count = count + 1
-                        cat = j[2] + ' (' + j[3] + ')'
-                        cia_fact_book_table[(cat,category_dict[cat],years[i])][(country,r_list[country])] = value                      
+                        fld = j[2] + ' (' + j[3] + ')'
+                        cat = category_dict[fld]
+                        cia_fact_book_table[(cat,fld,years[i])][(country,r_list[country])] = value                      
                     except ValueError,e:
                         print "error",e,"line=",k," year",years[i]," field=",j," value=",tempStr[l]
 
-cia_fact_book_table.columns=pd.MultiIndex.from_tuples(columns2D, names=['Field','Category','Year'])
+cia_fact_book_table.columns=pd.MultiIndex.from_tuples(columns2D, names=['Category','Field','Year'])
 cia_fact_book_table.index = pd.MultiIndex.from_tuples(index, names=['Country','Region'])
 #import seaborn as sns
 cia_fact_book_table.to_csv('/home/noelcjr/github/SF_DAT_17_WORK/data/cia_factbook_table.csv')
