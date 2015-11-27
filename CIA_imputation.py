@@ -10,7 +10,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 
-cia_fb = pd.read_csv('/home/noelcjr/github/SF_DAT_17_WORK/data/cia_factbook_table.csv',index_col=[0,1], header=[0, 1, 2]) #, skipinitialspace=True, tupleize_cols=False)
+cia_fb = pd.read_csv('/home/noelcjr/github/SF_DAT_17_WORK/data/cia_factbook_table.csv',index_col=[0,1], header=[0, 1, 2])
 years = [2014,2013,2012,2011,2010,2009,2008,2007,2006,2005,2004]
 catss = ['Geography','Economy','Communications','Transportation','Military','People and Society']
 new_tuples_cols = []
@@ -80,7 +80,7 @@ for i in cia_fb.columns:
             count = 0
             for k in cnull['value']:
                 if k:
-                    cia_fb.loc[j,(i[0],i[1],cnull.year[str(years[count])])] = float(linreg.predict(years[count])[0]) # Change cia_fb to cia_200fb
+                    cia_fb.loc[j,(i[0],i[1],cnull.year[str(years[count])])] = float(linreg.predict(years[count])[0]) 
                     #print('Null:',temp.index[j],years[count])
                     supercount = supercount + 1
                 count = count + 1
@@ -268,5 +268,6 @@ for i in list_2014:
 
 sns.heatmap(null_heatmap)
     
+countries_lr_stats.to_csv('/home/noelcjr/github/SF_DAT_17_WORK/data/cia_fb_linear_reg_coef.csv')
 cia_fb.to_csv('/home/noelcjr/github/SF_DAT_17_WORK/data/cia_fb_linear_reg_imputation.csv')
 
