@@ -62,6 +62,8 @@ cia_fb77_mean.index=pd.MultiIndex.from_tuples(cia_fb77_mean.index, names=['Count
 
 X = cia_fb77_mean.values
 
+np.random.seed(0)
+
 k_rng = range(1,35)
 est = [KMeans(n_clusters = k).fit(X) for k in k_rng]
 silhouette_score = [metrics.silhouette_score(X, e.labels_, metric='euclidean') for e in est[1:]]
