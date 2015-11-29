@@ -47,11 +47,13 @@ for i in cia_fb2.index:
 cia_fb3 = pd.DataFrame(cia_fb2, index=cia_fb2_Wd, columns=cia_fb.columns)  
 cia_fb3.columns=pd.MultiIndex.from_tuples(cia_fb.columns, names=['Category','Field','Year'])
 cia_fb3.index=pd.MultiIndex.from_tuples(cia_fb2_Wd, names=['Country','Region',])
-# This normalizes the numbers in the numbers so that all calumns are in ranges
+# This normalizes the numbers in the numbers so that all calumns are in ranges between 0 and 1
+# I use unit-based normalization Z = X−min(X) / max(X)−min(X) gives numbers from 0 to 1.
+# A regular normalization needs to be done on top of that. N = Z/sum(Z)
 for i in fields:
     for j in years:
+        cia_fb3[(i[0],i[1],str(j))] = (cia_fb3[(i[0],i[1],str(j))]-cia_fb3[(i[0],i[1],str(j))].min())/(cia_fb3[(i[0],i[1],str(j))].max()-cia_fb3[(i[0],i[1],str(j))].min())
         cia_fb3[(i[0],i[1],str(j))] = cia_fb3[(i[0],i[1],str(j))]/cia_fb3[(i[0],i[1],str(j))].sum()
-
 # Some of the columns are positive in value but are negative concepts. For example, infaltion is a
 # positive value, but the higher the infalcion the worst it is for its people. So those columns
 # will be multiplied by -1
@@ -89,6 +91,9 @@ for i in fields:
 cia_fb3_stats = pd.DataFrame(cia_fb_stats, index=cia_fb2_Wd, columns=cia_fb_stats.columns)  
 cia_fb3_stats.columns=pd.MultiIndex.from_tuples(cia_fb_stats.columns, names=['Category','Field','Stats'])
 cia_fb3_stats.index=pd.MultiIndex.from_tuples(cia_fb2_Wd, names=['Country','Region',])
+
+cia_fb3_stats.to_csv('C:\\Users\\noelc\\OneDrive\\Documents\\GitHub\\SF_DAT_17_WORK\\data\\cia_fb_77_linear_reg_coef.csv')
+cia_fb3.to_csv('C:\\Users\\noelc\\OneDrive\\Documents\\GitHub\\SF_DAT_17_WORK\\data\\cia_fb_77_reduction_n_normalization.csv')
 
 cia_fb3_stats.to_csv('C:\\Users\\noelc\\OneDrive\\Documents\\GitHub\\SF_DAT_17_WORK\\data\\cia_fb_77_linear_reg_coef.csv')
 cia_fb3.to_csv('C:\\Users\\noelc\\OneDrive\\Documents\\GitHub\\SF_DAT_17_WORK\\data\\cia_fb_77_reduction_n_normalization.csv')
