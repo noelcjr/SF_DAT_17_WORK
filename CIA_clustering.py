@@ -11,10 +11,12 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 from sklearn import metrics
-
-cia_fb77_stats = pd.read_csv('C:\\Users\\noelc\\OneDrive\\Documents\\GitHub\\SF_DAT_17_WORK\\data\\cia_fb_77_linear_reg_coef.csv',index_col=[0,1], header=[0, 1, 2])
-cia_fb77 = pd.read_csv('C:\\Users\\noelc\\OneDrive\\Documents\\GitHub\\SF_DAT_17_WORK\\data\\cia_fb_77_reduction_n_normalization.csv',index_col=[0,1], header=[0, 1, 2])
-
+#For windows
+#cia_fb77_stats = pd.read_csv('C:\\Users\\noelc\\OneDrive\\Documents\\GitHub\\SF_DAT_17_WORK\\data\\cia_fb_77_linear_reg_coef.csv',index_col=[0,1], header=[0, 1, 2])
+#cia_fb77 = pd.read_csv('C:\\Users\\noelc\\OneDrive\\Documents\\GitHub\\SF_DAT_17_WORK\\data\\cia_fb_77_reduction_n_normalization.csv',index_col=[0,1], header=[0, 1, 2])
+#Ubuntu:
+cia_fb77_stats = pd.read_csv('/home/noel/Projects/CIA_factbook/SF_DAT_17_WORK/data/cia_fb_77_linear_reg_coef.csv',index_col=[0,1], header=[0, 1, 2])
+cia_fb77 = pd.read_csv('/home/noel/Projects/CIA_factbook/SF_DAT_17_WORK/data/cia_fb_77_reduction_n_normalization.csv',index_col=[0,1], header=[0, 1, 2])
 years = [2014,2013,2012,2011,2010,2009,2008,2007,2006,2005,2004]
 catss = ['Geography','Economy','Communications','Transportation','Military','People and Society']
 stats_on_field = ['nulls','a1','b1','2014','a2','b2','2013']
@@ -48,7 +50,11 @@ cia_fb77_mean.index=pd.MultiIndex.from_tuples(cia_fb77_mean.index, names=['Count
 count = 0
 for i in cia_fb77.columns:
     temp = cia_fb77.xs((i[0],i[1]), level=('Category','Field'), axis=1)
+    print(i)
     for j in temp.index:
+        print(j)
+
++        # BUG: How to sum the values over the 11 years for a country, field and category?
         cia_fb77_mean.loc[j,(i[0],i[1])] = cia_fb77.loc[j,(i[0],i[1])].sum()/len(cia_fb77.loc[j,(i[0],i[1])])
 
 cia_fb77_mean.columns = fields2
@@ -78,3 +84,4 @@ plt.xlim([1,35])
 plt.grid(True)
 plt.title('Within Sum of Squared Errors')
 
+cia_fb77_mean.to_csv('/home/noel/Projects/CIA_factbook/SF_DAT_17_WORK/data/cia_fb77_means.csv')

@@ -9,13 +9,13 @@ import math
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
-
+# We read the data frame obtained from the output of cia_get_data.py
 cia_fb = pd.read_csv('/home/noelcjr/github/SF_DAT_17_WORK/data/cia_factbook_table.csv',index_col=[0,1], header=[0, 1, 2])
 years = [2014,2013,2012,2011,2010,2009,2008,2007,2006,2005,2004]
 catss = ['Geography','Economy','Communications','Transportation','Military','People and Society']
 new_tuples_cols = []
 stats_on_field = ['nulls','a1','b1','2014','a2','b2','2013']
-# Here I generate some lists that are us multindexing in the program
+# Here I generate some lists that are used in multindexing
 list_2014 = []
 list_2014_2013 = []
 for i in cia_fb.columns:

@@ -215,14 +215,8 @@ for i in range(0,len(years)):
 
 cia_fact_book_table.columns=pd.MultiIndex.from_tuples(columns2D, names=['Category','Field','Year'])
 cia_fact_book_table.index = pd.MultiIndex.from_tuples(index, names=['Country','Region'])
-#import seaborn as sns
-cia_fact_book_table.to_csv('/home/noelcjr/github/SF_DAT_17_WORK/data/cia_factbook_table.csv')
-#sns.pairplot(cia_fact_book_table, x_vars=['2014 GDP (purchasing power parity)'], y_vars='2014 GDP (purchasing power parity)')
-# Create a data frame with same indexes as cia_fact_book_table and with a Nans count.
-#col_nulls = pd.DataFrame(index=index, columns=['Nans'])
-#for i in cia_fact_book_table.index:
-#    col_nulls.ix[i]['Nans'] = cia_fact_book_table[cia_fact_book_table.index == i].isnull().sum()[0:330].sum()
 
-# Rank countries by number of columns with null values
+cia_fact_book_table.to_csv('/home/noelcjr/github/SF_DAT_17_WORK/data/cia_factbook_table.csv')
+
 
   
